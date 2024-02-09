@@ -30,11 +30,11 @@ export function createDirectionalLight(scene) {
 export function createPointLight(scene, number) {
   const pointLight = new PointLight(
     `pointLight ${number}`,
-    new Vector3(Math.floor(2 * number) - 2, 1, Math.floor(2 * number) - 2),
+    new Vector3(0, 1, 0),
     scene
   );
 
-  pointLight.intensity = 10;
+  pointLight.intensity = 0;
   pointLight.diffuse = new Color3(1, 1, 0);
 
   return pointLight;
@@ -43,14 +43,14 @@ export function createPointLight(scene, number) {
 export function createSpotLight(scene) {
   const spotLight = new SpotLight(
     `spotLight`,
-    new Vector3(0, 1, 0),
-    new Vector3(0, 1, 3),
+    new Vector3(0, 0, 0),
+    new Vector3(0, -1, 0),
     Math.PI / 2,
     10,
     scene
   );
 
-  spotLight.intensity = 10000;
+  spotLight.intensity = 100;
   spotLight.diffuse = new Color3(1, 0, 0);
 
   return spotLight;

@@ -1,11 +1,18 @@
 import { CubeTexture } from "@babylonjs/core";
 
 export function createSkyBox(scene) {
-  const envTex = CubeTexture.CreateFromPrefilteredData(
+  const envSkyTex = CubeTexture.CreateFromPrefilteredData(
     "./environment/sky.env",
     scene
   );
 
-  scene.environmentTexture = envTex;
-  scene.createDefaultSkybox(envTex, true);
+  const envNightTex = CubeTexture.CreateFromPrefilteredData(
+    "./environment/night.env",
+    scene
+  );
+
+  scene.environmentTexture = envSkyTex;
+  scene.createDefaultSkybox(envSkyTex, true);
+
+  return [envSkyTex, envNightTex];
 }

@@ -10,4 +10,5 @@ export function createRoad(scene) {
 
   road.position.y = 0.001;
   road.material = createRoadMaterial(scene);
+  road.material.maxSimultaneousLights = 10;
 }

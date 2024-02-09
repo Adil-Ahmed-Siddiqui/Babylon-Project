@@ -1,16 +1,10 @@
 import "@babylonjs/loaders";
 import "@babylonjs/inspector";
-import { Vector3 } from "@babylonjs/core";
 
-import {
-  createFreeCamera,
-  createArcCamera,
-  createFollowCamera,
-  createUniversalCamera,
-} from "./cameras";
+import { createFreeCamera } from "./cameras";
 import { createSkyBox } from "./environment";
 import { createGround, createFootball, createLog, createRoad } from "./meshes";
-import { toggleLights } from "./actions";
+import { toggleLights, toggleCameras } from "./actions";
 import {
   importFootballField,
   importCar,
@@ -25,6 +19,8 @@ export class BabylonProject {
     this.engine = engine;
     this.canvas = canvas;
     this.scene = scene;
+    this.skyBoxes = [];
+    this.nonRigidMeshes = [];
 
     this.createEnvironment();
   }
@@ -32,29 +28,29 @@ export class BabylonProject {
   async createEnvironment() {
     this.engine.displayLoadingUI();
 
-    await importFootballField(this.scene);
+    await importFootballField(this.scene, this.nonRigidMeshes);
     await importStreetLight(this.scene);
     await importCar(this.scene);
     await importStore(this.scene);
     await importLamp(this.scene);
     await importWatch(this.scene);
 
-    createSkyBox(this.scene);
+    this.skyBoxes = createSkyBox(this.scene);
 
     createFreeCamera(this.scene);
-    // createUniversalCamera(this.scene, this.canvas);
-    // createArcCamera(this.scene, this.canvas);
-    // createFollowCamera(this.scene, this.canvas);
 
     createGround(this.scene);
     createRoad(this.scene);
     createFootball(this.scene);
     // createLog(this.scene);
 
-    toggleLights(this.scene);
+    toggleLights(this.scene, this.skyBoxes);
+    toggleCameras(this.scene, this.canvas, this.engine);
 
     this.scene.meshes.forEach((mesh) => {
-      mesh.checkCollisions = true;
+      if (!this.nonRigidMeshes.includes(mesh)) {
+        mesh.checkCollisions = true;
+      }
     });
 
     setTimeout(() => this.engine.hideLoadingUI(), 1000);

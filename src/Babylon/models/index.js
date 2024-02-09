@@ -1,18 +1,23 @@
 import { SceneLoader, Vector3 } from "@babylonjs/core";
 import { createSpotLight, createPointLight } from "../lights";
 
-export async function importFootballField(scene) {
+export async function importFootballField(scene, nonRigidMeshes) {
   const models = await SceneLoader.ImportMeshAsync(
     "",
     "./models/",
     "football_field.glb"
   );
 
-  models.meshes[0].position = new Vector3(-3.6, -0.1, 4);
+  const boundingInfo = models.meshes[0].getBoundingInfo();
+  const height = boundingInfo.maximum.y - boundingInfo.minimum.y;
+
+  models.meshes[0].position = new Vector3(-3.6, -0.11, 4);
   models.meshes[0].scaling = new Vector3(0.05, 0.05, 0.05);
   models.meshes[0].rotation = new Vector3(0, Math.PI / 2, 0);
 
   models.meshes.forEach((mesh) => {
+    nonRigidMeshes.push(mesh);
+
     if (mesh.material) {
       mesh.material.environmentIntensity = 1;
     }
@@ -69,8 +74,8 @@ export async function importLamp(scene) {
   });
 
   let spotLight = createSpotLight(scene);
-  spotLight.position = new Vector3(0, 1, 0);
-  //   spotLight.parent = models.meshes[0];
+  // spotLight.parent = scene.meshes[67];
+  spotLight.parent = models.meshes[0];
 }
 
 export async function importWatch(scene) {
@@ -100,7 +105,7 @@ export async function importStreetLight(scene) {
   );
 
   const streetLights = [models.meshes[0]];
-  const spotLights = [];
+  const pointLights = [];
 
   const boundingInfo = models.meshes[0].getBoundingInfo();
   const height = boundingInfo.maximum.y - boundingInfo.minimum.y;
@@ -120,31 +125,16 @@ export async function importStreetLight(scene) {
 
   streetLights.forEach((streetLight, index) => {
     streetLight.scaling = new Vector3(0.2, 0.2, 0.2);
+    let pointLight = createPointLight(scene, index);
+
     if (index < 5) {
       streetLight.position = new Vector3(0.8, height / 2, index * 2 - 4);
+      pointLight.position = new Vector3(-1.5, 1, index * 2 - 4);
     } else {
       streetLight.position = new Vector3(3.6, height / 2, index * 2 - 14);
+      pointLight.position = new Vector3(1.5, 1, index * 2 - 14);
     }
 
-    // let spotLight = createPointLight(scene, index);
-    // // spotLight.parent = streetLight;
-    // spotLight.position = new Vector3(
-    //   Math.floor(2 * index) - 2,
-    //   1,
-    //   Math.floor(2 * index) - 2
-    // );
-    // spotLights.push(spotLight);
-
-    // console.log(spotLight.position);
+    pointLights.push(pointLight);
   });
-
-  for (let i = 0; i < numberOfClones + 1; i++) {
-    let pointLight = createPointLight(scene, i);
-    console.log(pointLight);
-    //   spotLight.position = new Vector3(0, 0, 1 * i - 6);
-  }
-
-  console.log(scene.meshes);
-
-  //   console.log(spotLights);
 }
