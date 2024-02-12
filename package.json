@@ -11,9 +11,16 @@
   },
   "dependencies": {
     "@babylonjs/core": "^6.41.0",
+    "@babylonjs/gui": "^6.42.0",
     "@babylonjs/inspector": "^6.42.0",
     "@babylonjs/loaders": "^6.41.1",
+    "ammojs": "^0.0.2",
+    "ammojs-typed": "^1.0.6",
+    "ammojs3": "^0.0.11",
     "babylonjs-hook": "^0.1.1",
+    "cannon": "^0.6.2",
+    "install": "^0.13.0",
+    "npm": "^10.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.15.0"

@@ -1,4 +1,4 @@
-import { MeshBuilder } from "@babylonjs/core";
+import { MeshBuilder, PhysicsImpostor } from "@babylonjs/core";
 import { createGroundMaterial } from "../materials/ground";
 
 export function createGround(scene) {
@@ -10,4 +10,10 @@ export function createGround(scene) {
 
   ground.material = createGroundMaterial(scene);
   ground.material.maxSimultaneousLights = 10;
+
+  ground.physicsImpostor = new PhysicsImpostor(
+    ground,
+    PhysicsImpostor.BoxImpostor,
+    { mass: 0 }
+  );
 }

@@ -1,5 +1,6 @@
 import { SceneLoader, Vector3 } from "@babylonjs/core";
 import { createSpotLight, createPointLight } from "../lights";
+import { createAlien } from "../meshes/alien";
 
 export async function importFootballField(scene, nonRigidMeshes) {
   const models = await SceneLoader.ImportMeshAsync(
@@ -136,5 +137,59 @@ export async function importStreetLight(scene) {
     }
 
     pointLights.push(pointLight);
+  });
+}
+
+export async function importEnemies(scene, engine, enemies) {
+  const models = await SceneLoader.ImportMeshAsync(
+    "",
+    "./models/",
+    "grey_alien.glb"
+  );
+
+  models.meshes[0].isPickable = false;
+  models.meshes[1].name = "alien";
+  models.meshes[2].name = "alien";
+
+  // const alienMinSize = 0.4;
+  // const alienMaxSize = 1;
+  const alienSize = 0.75; //Math.random() * (alienMaxSize - alienMinSize) + alienMinSize;
+
+  // let alienCol = createAlien(models.meshes[0]);
+  // models.meshes[0].parent = alienCol;
+
+  // models.meshes[0].position = new Vector3(0, -0.6, 0);
+
+  models.meshes[0].position = new Vector3(3, 0, 3);
+  models.meshes[0].scaling = new Vector3(alienSize, alienSize, alienSize);
+
+  scene.registerBeforeRender(() => {
+    const camera = scene.cameras[0];
+    const speed = 0.0075; // Adjust the speed as needed
+
+    // const direction = camera.position.subtract(alienCol.position);
+    // const movementDirection = new Vector3(direction.x, 0, direction.z);
+
+    // alienCol.position.addInPlace(
+    //   movementDirection.normalize().scaleInPlace(speed)
+    // );
+
+    // alienCol.lookAt(new Vector3(camera.position.x, 0, camera.position.z));
+
+    const direction = camera.position.subtract(models.meshes[0].position);
+    const movementDirection = new Vector3(direction.x, 0, direction.z);
+
+    models.meshes[0].position.addInPlace(
+      movementDirection.normalize().scaleInPlace(speed)
+    );
+    models.meshes[0].lookAt(
+      new Vector3(camera.position.x, 0, camera.position.z)
+    );
+  });
+
+  models.meshes.forEach((mesh) => {
+    if (mesh.material) {
+      mesh.material.environmentIntensity = 1;
+    }
   });
 }

@@ -7,16 +7,12 @@ import {
 } from "@babylonjs/core";
 
 export function createFreeCamera(scene) {
-  scene.onPointerDown = (evt) => {};
-
   const camera = new FreeCamera("camera_A", new Vector3(0, 1, -5), scene);
   camera.attachControl();
   camera.speed = 0.25;
 }
 
 export function createArcCamera(scene, canvas, targetMesh) {
-  scene.onPointerDown = (evt) => {};
-
   const camera = new ArcRotateCamera(
     "camera_B",
     0,
@@ -39,8 +35,6 @@ export function createArcCamera(scene, canvas, targetMesh) {
 }
 
 export function createFollowCamera(scene, canvas, targetMesh) {
-  scene.onPointerDown = (evt) => {};
-
   const camera = new FollowCamera("camera_C", new Vector3(0, 1, -5), scene);
 
   camera.heightOffset = 3;
@@ -57,11 +51,6 @@ export function createFollowCamera(scene, canvas, targetMesh) {
 export function createUniversalCamera(scene, canvas, engine) {
   scene.gravity = new Vector3(0, -0.15, 0);
   scene.collisionsEnabled = true;
-
-  scene.onPointerDown = (evt) => {
-    if (evt.button === 0) engine.enterPointerlock();
-    if (evt.button === 1) engine.exitPointerlock();
-  };
 
   const camera = new UniversalCamera("camera_D", new Vector3(3, 0.4, 0), scene);
 

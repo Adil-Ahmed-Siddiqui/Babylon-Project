@@ -1,4 +1,4 @@
-import { MeshBuilder, Vector3 } from "@babylonjs/core";
+import { MeshBuilder, Vector3, PhysicsImpostor } from "@babylonjs/core";
 import { createFootballMaterial } from "../materials/football";
 
 export function createFootball(scene) {
@@ -8,4 +8,10 @@ export function createFootball(scene) {
   ball.position = new Vector3(0, 0, 0.7);
 
   ball.material = createFootballMaterial(scene);
+
+  ball.physicsImpostor = new PhysicsImpostor(
+    ball,
+    PhysicsImpostor.BoxImpostor,
+    { mass: 1 }
+  );
 }

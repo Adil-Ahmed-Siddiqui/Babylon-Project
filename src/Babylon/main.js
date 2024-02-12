@@ -5,6 +5,8 @@ import { createFreeCamera } from "./cameras";
 import { createSkyBox } from "./environment";
 import { createGround, createFootball, createLog, createRoad } from "./meshes";
 import { toggleLights, toggleCameras } from "./actions";
+import { createPhysics } from "./physics.js";
+import { createGUI } from "./gui/index.js";
 import {
   importFootballField,
   importCar,
@@ -12,6 +14,7 @@ import {
   importStore,
   importLamp,
   importWatch,
+  importEnemies,
 } from "./models";
 
 export class BabylonProject {
@@ -21,12 +24,14 @@ export class BabylonProject {
     this.scene = scene;
     this.skyBoxes = [];
     this.nonRigidMeshes = [];
+    this.enemies = [];
 
     this.createEnvironment();
   }
 
   async createEnvironment() {
     this.engine.displayLoadingUI();
+    createPhysics(this.scene, this.engine);
 
     await importFootballField(this.scene, this.nonRigidMeshes);
     await importStreetLight(this.scene);
@@ -47,11 +52,15 @@ export class BabylonProject {
     toggleLights(this.scene, this.skyBoxes);
     toggleCameras(this.scene, this.canvas, this.engine);
 
+    await importEnemies(this.scene, this.engine, this.enemies);
+
     this.scene.meshes.forEach((mesh) => {
       if (!this.nonRigidMeshes.includes(mesh)) {
         mesh.checkCollisions = true;
       }
     });
+
+    await createGUI(this.scene, this.engine, this.canvas);
 
     setTimeout(() => this.engine.hideLoadingUI(), 1000);
   }
