@@ -6,16 +6,16 @@ import { AmmoJSPlugin, CannonJSPlugin, Sound } from "@babylonjs/core";
 import { createCrackMaterial } from "../materials/crack";
 import { createBloodMaterial } from "../materials/blood";
 
-export function createPhysics(scene, engine) {
+export function createPhysics(scene, engine, enemies) {
   scene.enablePhysics(
-    new Vector3(0, -9.81, 0),
+    new Vector3(0, -0.15, 0),
     new CannonJSPlugin(true, 10, CANNON)
   );
 
-  createPickingRay(scene, engine);
+  createPickingRay(scene, engine, enemies);
 }
 
-function createPickingRay(scene, engine) {
+function createPickingRay(scene, engine, enemies) {
   const crackMat = createCrackMaterial(scene);
   const bloodMat = createBloodMaterial(scene);
   const hitSound = new Sound("hit", "./audio/hit.mp3", scene, null, {
@@ -26,6 +26,11 @@ function createPickingRay(scene, engine) {
     loop: false,
     autoplay: false,
     volume: 0.1,
+  });
+  const killSound = new Sound("hit", "./audio/kill.mp3", scene, null, {
+    loop: false,
+    autoplay: false,
+    volume: 0.3,
   });
 
   scene.onPointerDown = (evt) => {
@@ -42,9 +47,10 @@ function createPickingRay(scene, engine) {
 
       const raycastHit = scene.pickWithRay(ray);
 
-      if (raycastHit.hit && raycastHit.pickedMesh.name !== "alien") {
-        console.log(raycastHit.pickedMesh.name);
-
+      if (
+        raycastHit.hit &&
+        !["alien", "ball"].includes(raycastHit.pickedMesh.name)
+      ) {
         const crack = MeshBuilder.CreateDecal("crack", raycastHit.pickedMesh, {
           position: raycastHit.pickedPoint,
           normal: raycastHit.getNormal(true),
@@ -69,6 +75,17 @@ function createPickingRay(scene, engine) {
 
         hitSound.play();
 
+        let alienRoot = enemies.find((enemy) =>
+          enemy.intersectsMesh(raycastHit.pickedMesh, false)
+        );
+
+        alienRoot.hitCount += 1;
+        if (alienRoot.hitCount > 10) {
+          killSound.play();
+          alienRoot.killed = true;
+          //   alienRoot.dispose();
+        }
+
         // let alienCol = raycastHit.pickedMesh.parent;
 
         // do {
@@ -81,6 +98,13 @@ function createPickingRay(scene, engine) {
         // );
 
         setTimeout(() => blood.dispose(), 3000);
+      } else if (raycastHit.hit && raycastHit.pickedMesh.name === "ball") {
+        const ball = raycastHit.pickedMesh;
+
+        ball.physicsImpostor.applyForce(
+          ray.direction.scale(100),
+          raycastHit.pickedPoint
+        );
       }
     }
   };

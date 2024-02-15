@@ -4,7 +4,7 @@ import { createGroundMaterial } from "../materials/ground";
 export function createGround(scene) {
   const ground = MeshBuilder.CreateGround(
     "ground",
-    { width: 10, height: 10 },
+    { width: 100, height: 100 },
     scene
   );
 
@@ -14,6 +14,6 @@ export function createGround(scene) {
   ground.physicsImpostor = new PhysicsImpostor(
     ground,
     PhysicsImpostor.BoxImpostor,
-    { mass: 0 }
+    { mass: 0, restitution: 1 }
   );
 }

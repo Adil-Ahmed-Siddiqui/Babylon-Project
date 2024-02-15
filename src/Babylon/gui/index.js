@@ -7,7 +7,7 @@ export async function createGUI(scene, engine, canvas) {
     height: 0.75,
   });
 
-  calcPlane.position = new Vector3(3, 0.75 / 2, 5);
+  calcPlane.position = new Vector3(3, 0.75 / 2, 4.5);
   const advancedTexture = GUI.AdvancedDynamicTexture.CreateForMesh(calcPlane);
   await advancedTexture.parseFromSnippetAsync("86LGV7#5");
 

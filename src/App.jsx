@@ -2,12 +2,14 @@ import "./App.css";
 import SceneComponent from "babylonjs-hook";
 import { BabylonProject } from "./Babylon/main";
 
+let project;
+
 const onSceneReady = (scene) => {
   scene.debugLayer.show(); // show inspector
   const canvas = scene.getEngine().getRenderingCanvas();
   const engine = scene.getEngine();
 
-  new BabylonProject(engine, canvas, scene);
+  project = new BabylonProject(engine, canvas, scene);
 };
 
 const onRender = (scene) => {
@@ -18,6 +20,13 @@ const onRender = (scene) => {
       car.position.z -= 0.025;
     }
   }
+
+  project.enemies.forEach((enemy) => {
+    if (enemy.killed) {
+      // enemy.visibility -= 0.00025;
+      // enemy.visibility < 0 && enemy.dispose();
+    }
+  });
 };
 
 const App = () => (

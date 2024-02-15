@@ -1,6 +1,7 @@
-import { SceneLoader, Vector3 } from "@babylonjs/core";
+import { SceneLoader, Vector3, Tools } from "@babylonjs/core";
 import { createSpotLight, createPointLight } from "../lights";
 import { createAlien } from "../meshes/alien";
+import axios from "axios";
 
 export async function importFootballField(scene, nonRigidMeshes) {
   const models = await SceneLoader.ImportMeshAsync(
@@ -140,6 +141,61 @@ export async function importStreetLight(scene) {
   });
 }
 
+export async function importWorld(scene, engine, worldId) {
+  const token =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNpZGRpcXVpLmFkaWxAc3lzdGVtc2x0ZC5jb20iLCJpYXQiOjE3MDc4MjM5NzUsImV4cCI6MTcwODQyODc3NX0.1vIqAlNTqR7WdMupoWPWJzXpZGZ5X7mAdHf1ZI8wVow";
+  const options = {
+    headers: {
+      Authorization: "Bearer " + token,
+    },
+  };
+
+  try {
+    const response = await axios.get(
+      `https://cms.riftspace.digital/backend/v3/world/${worldId}`,
+      options
+    );
+
+    const world = response.data;
+    const assets = world.data.config.assets;
+
+    let promises = [];
+    let modulesArray = [];
+
+    for (const [key, value] of Object.entries(assets)) {
+      const asset = value.asset;
+
+      promises.push(
+        SceneLoader.ImportMeshAsync(
+          "",
+          `https://cms.riftspace.digital/backend/v3/${asset.url}/`,
+          asset.filename,
+          scene
+        )
+      );
+
+      modulesArray.push(value.modules);
+    }
+
+    const modelsArray = await Promise.all(promises);
+
+    modelsArray.forEach((models, index) => {
+      for (const [key, value] of Object.entries(modulesArray[index])) {
+        if (key === "transform") {
+          let { position, rotation, scaling } = JSON.parse(value);
+          models.meshes[0].position = new Vector3(...position);
+          models.meshes[0].rotation = new Vector3(
+            Tools.ToRadians(rotation[0]),
+            Tools.ToRadians(rotation[1]),
+            Tools.ToRadians(rotation[2])
+          );
+          models.meshes[0].scaling = new Vector3(...scaling);
+        }
+      }
+    });
+  } catch (error) {}
+}
+
 export async function importEnemies(scene, engine, enemies) {
   const models = await SceneLoader.ImportMeshAsync(
     "",
@@ -148,6 +204,10 @@ export async function importEnemies(scene, engine, enemies) {
   );
 
   models.meshes[0].isPickable = false;
+  models.meshes[0].hitCount = 0;
+  models.meshes[0].killed = false;
+  models.meshes[0].name = "alien_root";
+
   models.meshes[1].name = "alien";
   models.meshes[2].name = "alien";
 
@@ -185,6 +245,8 @@ export async function importEnemies(scene, engine, enemies) {
     models.meshes[0].lookAt(
       new Vector3(camera.position.x, 0, camera.position.z)
     );
+
+    enemies.push(models.meshes[0]);
   });
 
   models.meshes.forEach((mesh) => {

@@ -15,6 +15,7 @@ import {
   importLamp,
   importWatch,
   importEnemies,
+  importWorld,
 } from "./models";
 
 export class BabylonProject {
@@ -31,7 +32,7 @@ export class BabylonProject {
 
   async createEnvironment() {
     this.engine.displayLoadingUI();
-    createPhysics(this.scene, this.engine);
+    createPhysics(this.scene, this.engine, this.enemies);
 
     await importFootballField(this.scene, this.nonRigidMeshes);
     await importStreetLight(this.scene);
@@ -53,6 +54,7 @@ export class BabylonProject {
     toggleCameras(this.scene, this.canvas, this.engine);
 
     await importEnemies(this.scene, this.engine, this.enemies);
+    await importWorld(this.scene, this.engine, "658e813b02c946f499003bf4");
 
     this.scene.meshes.forEach((mesh) => {
       if (!this.nonRigidMeshes.includes(mesh)) {
